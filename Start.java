@@ -1,4 +1,4 @@
-package forwardpass2409041258;
+package forwardpass2409101214;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -9,11 +9,17 @@ import java.io.IOException;
 public class Start {
     final static String ROOT= "C:\\Users\\sven-.SVEN\\Documents\\IntelliJ\\convolutionalNeuralNet\\src\\forwardpass2409031354\\";
     public static void main(String[] args) throws IOException {
-        BufferedImage inputImage= ImageIO.read(new File(ROOT+"seven.png"));
-        final byte[] pixels= ((DataBufferByte) inputImage.getRaster().getDataBuffer()).getData();
-        final int inputHorRes= inputImage.getWidth();
-        final int inputVerRes= inputImage.getHeight();
-        int[][] result= new int[inputVerRes][inputHorRes];
+        float[][]pixels= pixelsToFloatMap(ImageIO.read(new File(ROOT+"seven.png")));
+        Func reLu= x-> (x[0]>0)? x[0]: 0;
+        ConvolutionLayer layerA= new ConvolutionLayer(pixels, 2,5, reLu);
+
+    }
+
+    static float[][] pixelsToFloatMap(BufferedImage image) {
+        final byte[] pixels= ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
+        final int inputHorRes= image.getWidth();
+        final int inputVerRes= image.getHeight();
+        float[][] result= new float[inputVerRes][inputHorRes];
 
         for(int pixel=1, row=0, col=0; pixel<pixels.length; pixel+=4) {
             result[row][col]= pixels[pixel];
@@ -21,7 +27,7 @@ public class Start {
             if (result[row][col]< 0) { //if pixel value is negative, change to positive //still weird to me
                 result[row][col]+= 256;
             }
-            
+
             col++;
             if (col== inputHorRes) {
                 col= 0;
@@ -30,8 +36,6 @@ public class Start {
                 }
             }
         }
-        Func reLu= x-> (x[0]>0)? x[0]: 0;           //f(x)= max(0, x)
-        Layer layerA= new Layer(inputHorRes, inputVerRes,2,5,5,1,
-                                reLu,2,2);
+        return result;
     }
 }
