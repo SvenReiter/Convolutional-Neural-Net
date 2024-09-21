@@ -1,4 +1,3 @@
-package forwardpass2409111257;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -12,14 +11,19 @@ public class Start {
         Defines tests for testing Pooling-function of PoolingLayer();
         Adds a few more PoolingLayer()-tests;
         Extends Pooling-functions Paramlist by a divisor(usually 1), to make possible defining average-pooling;
+        Adds param <stride> to Pooling-functions Paramlist;
+        Customizes/Decreases filters[][][].length from Convolution;
+        Sums up all the values in <channel[fNr]> and adds the bias-term and
+        passes the sum to <activationFunc> and writes the result of to activationLayer
+        in Convolution.convolution(int,int,func);
      */
     final static String ROOT= "C:\\Users\\sven-.SVEN\\Documents\\IntelliJ\\convolutionalNeuralNet\\src\\forwardpass2409101214\\";
     public static void main(String[] args) throws IOException {
         float[][]pixels= pixelsToFloatMap(ImageIO.read(new File(ROOT+"seven.png")));
         Func reLu= x-> (x[0]>0)? x[0]: 0;
-        ConvolutionLayer convolutionLayerA= new ConvolutionLayer(pixels, 2,5, reLu);
+        Convolution convolutionA = new Convolution(pixels, 2,5, reLu);
         Func maxPooling= x-> (x[0]>x[1])? x[0]: x[1];
-        PoolingLayer poolingLayerA= new PoolingLayer(convolutionLayerA.getChannel(0), 2, maxPooling, 1);
+        Pooling poolingA = new Pooling(convolutionA.getChannel(0), 2, 2, maxPooling, 1);
     }
 
     static float[][] pixelsToFloatMap(BufferedImage image) {
