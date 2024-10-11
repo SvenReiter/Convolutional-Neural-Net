@@ -1,3 +1,4 @@
+
 public class Layer {
     final Convolution CONV;
     final Pooling POOL;

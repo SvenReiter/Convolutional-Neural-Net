@@ -1,3 +1,4 @@
+
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
@@ -5,7 +6,125 @@ public class PoolingTest {
     final float DELTA= (float)Math.pow(10, -3);
 
     @Test
-    void testsConvolutionsChannelPooling() {
+    void testsMaxPoolingLayerOne() {
+        float[][] input = new float[][]{
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 84, 185, 159, 151, 60, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 222, 254, 254, 254, 254, 241, 198, 198, 198, 198,198,198,198,198,170,52,0,0,0,0,0,0},
+                {0, 0, 0, 0, 0, 0, 67, 114, 72, 114, 163, 227, 254, 225, 254, 254, 254,250,229,254,254,140,0,0,0,0,0,0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 17, 66, 14, 67, 67, 67, 59, 21, 236, 254, 106, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 83, 253, 209, 18, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 22, 233, 255, 83, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 129, 254, 238, 44, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 59, 249, 254, 62, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 133, 254, 187, 5, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 205, 248, 58, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 126, 254, 182, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 75, 251, 240, 57, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 19, 221, 254, 166, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 203, 254, 219, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 38, 254, 254, 77, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 224, 254, 115, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 133, 254, 254, 52, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 61, 242, 254, 254, 52, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 121, 254, 254, 219, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 121, 254, 207, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+        };
+        float[][][] filters = new float[][][]{
+                {
+                        {0.003f, -0.077f, -0.037f, 0.039f, -0.095f},
+                        {0.103f, -0.345f, 0.22f, 0.01f, 0.137f},
+                        {0.028f, -0.259f, -0.108f, -0.077f, 0.14f},
+                        {-0.078f, -0.062f, 0.021f, -0.015f, -0.018f},
+                        {-0.042f, 0.067f, 0.088f, 0.051f, 0.2f}
+
+                }, {
+                        {0.028f, 0.06f, 0.046f, 0.069f, 0.214f},
+                        {-0.093f, -0.019f, 0.036f, 0.23f, -0.115f},
+                        {-0.265f, -0.43f, -0.266f, -0.278f, -0.328f},
+                        {-0.005f, -0.029f, -0.244f, -0.132f, -0.216f},
+                        {0.111f, -0.035f, 0.197f, 0.183f, 0.136f}
+
+                }};
+        float[] biases = new float[]{0.0155f, -0.567f};
+        Func reLu = x -> (x[0] > 0) ? x[0] : 0;
+        int STRIDE = 1;
+        Convolution c = new Convolution(input, filters, 5, 5, biases, reLu, STRIDE);
+        Func maxPool = param -> {
+            float result = 0f;
+            for (float f : param) {
+                if (f > result) {
+                    result = f;
+                }
+            }
+            return result;
+        };
+        STRIDE= 2;
+        Pooling p = new Pooling(2, STRIDE, maxPool);
+        Assert.assertEquals(28, input.length);
+        Assert.assertEquals(28, input[0].length);
+        Assert.assertEquals(24, c.getActivation()[0].length);
+        Assert.assertEquals(24, c.getActivation()[0][0].length);
+        float[][] pooledDecreasedChannelA = p.poolChannel(c.getActivation()[0]);
+        Assert.assertEquals(12, pooledDecreasedChannelA.length);
+        Assert.assertEquals(12, pooledDecreasedChannelA[0].length);
+
+        Assert.assertEquals(24, c.getActivation()[1].length);
+        Assert.assertEquals(24, c.getActivation()[1][0].length);
+        float[][] pooledDecreasedChannelB = p.poolChannel(c.getActivation()[1]);
+        Assert.assertEquals(12, pooledDecreasedChannelB.length);
+        Assert.assertEquals(12, pooledDecreasedChannelB[0].length);
+
+        //The upper channel Max Pooling | Layer 1 result
+        float[][] resultMaxPoolingLayerA = new float[][]{
+//                 0        1        2        3         4         5         6        7       8       9      10      11
+/* 0*/      {0.0155f, 0.0155f, 0.0155f, 0.0155f,  0.0155f,  0.0155f,  0.0155f, 0.0155f,0.0155f,0.0155f,0.0155f,0.0155f},
+/* 1*/      {0.0155f, 41.300f, 60.233f, 42.576f,  10.571f,  0.0155f,  0.0155f, 0.0155f,0.0155f,0.0155f,0.0155f,0.0155f},
+/* 2*/      {0.0155f, 57.547f,  94.57f, 75.788f,  62.530f,  67.474f,  72.088f, 72.088f,66.488f,22.578f, 0.000f,0.0155f},
+/* 3*/      {0.0155f, 41.610f, 69.262f,  2.785f,   0.000f,   0.000f,   0.000f,  0.000f, 0.013f, 0.000f, 0.267f,0.0155f},
+/* 4*/      {0.0155f,  0.832f,  3.321f,  5.924f,  11.356f,   0.000f,   3.912f, 79.391f,44.724f, 0.000f,16.156f,0.0155f},
+/* 5*/      {0.0155f, 0.0155f, 0.0155f, 0.0155f,   0.631f,  0.0155f,  73.306f,104.889f,23.210f, 0.000f, 9.038f,0.0155f},
+/* 6*/      {0.0155f, 0.0155f, 0.0155f, 0.0155f,  0.0155f,  25.216f, 100.686f, 63.059f, 0.000f, 5.070f, 4.797f,0.0155f},
+/* 7*/      {0.0155f, 0.0155f, 0.0155f, 0.0155f,   3.816f,  75.756f, 102.271f, 40.203f, 0.000f,15.163f,0.0155f,0.0155f},
+/* 8*/      {0.0155f, 0.0155f, 0.0155f, 0.0155f,  51.714f, 113.974f,  73.433f,  0.000f,16.636f, 0.189f,0.0155f,0.0155f},
+/* 9*/      {0.0155f, 0.0155f, 0.0155f, 26.057f, 126.863f,  93.122f,   0.000f,  0.556f,14.425f,0.0155f,0.0155f,0.0155f},
+/*10*/      {0.0155f, 0.0155f, 0.0155f, 74.583f, 120.204f,  45.411f,   0.000f, 5.937f, 0.121f,0.0155f,0.0155f,0.0155f},
+/*11*/      {0.0155f, 0.0155f, 0.0155f, 95.059f,  85.572f,   0.000f,   0.000f,  6.648f,0.0155f,0.0155f,0.0155f,0.0155f},
+
+        };
+
+        //The lower channel of Max Pooling | Layer 1 result
+        float[][] resultMaxPoolingLayerB = new float[][]{
+//              0        1        2         3         4         5         6         7         8       9      10     11
+/* 0*/      {0.0f,	0.000f,  0.000f,   0.000f,   0.000f,   0.000f,   0.000f,   0.000f,   0.000f, 0.000f, 0.000f,0.000f},
+/* 1*/      {0.0f, 39.965f, 82.571f,  69.398f,  30.205f,   4.833f,   0.000f,   0.000f,   0.000f, 0.000f, 0.000f,0.000f},
+/* 2*/      {0.0f, 23.555f, 44.933f,  89.957f, 118.097f, 121.242f, 116.649f, 116.649f, 112.841f,57.487f,20.369f,0.000f},
+/* 3*/      {0.0f, 10.651f,  14.16f,   0.000f,   0.000f,   0.000f,   0.000f,   0.000f,   0.000f, 0.000f, 0.000f,0.000f},
+/* 4*/      {0.0f, 71.407f,  102.6f, 106.125f, 102.705f, 108.635f, 124.937f,  83.483f,   0.000f, 0.000f, 0.000f,0.000f},
+/* 5*/      {0.0f,  0.000f,  0.000f,   3.071f,   14.73f,  23.474f,  33.757f,   0.000f,   0.000f, 0.000f, 0.727f,0.000f},
+/* 6*/      {0.0f,  0.000f,  0.000f,   0.000f,   0.000f,  16.569f,   0.000f,   0.000f,   0.000f, 1.646f, 0.665f,0.000f},
+/* 7*/      {0.0f,  0.000f,  0.000f,   0.000f,   2.017f,  20.078f,   0.000f,   0.000f,   0.000f, 0.704f, 0.000f,0.000f},
+/* 8*/      {0.0f,  0.000f,  0.000f,   0.000f,  23.486f,   0.000f,   0.000f,   0.000f,   0.000f, 1.057f, 0.000f,0.000f},
+/* 9*/      {0.0f,  0.000f,  0.000f,  10.825f,  26.378f,   0.000f,   0.000f,   0.000f,   1.029f, 0.000f, 0.000f,0.000f},
+/*10*/      {0.0f,  0.000f,  0.000f,   7.729f,   0.000f,   0.000f,   0.000f,   1.496f,   0.413f, 0.000f, 0.000f,0.000f},
+/*11*/      {0.0f,  0.000f,  0.000f,   0.000f,   0.000f,   0.000f,   0.000f,   0.000f,   0.000f, 0.000f, 0.000f,0.000f},
+        };
+
+        for(int i=0; i<12; i++) {
+            Assert.assertArrayEquals(resultMaxPoolingLayerA[i], pooledDecreasedChannelA[i], DELTA);
+            Assert.assertArrayEquals(resultMaxPoolingLayerB[i], pooledDecreasedChannelB[i], DELTA);
+        }
+    }
+
+    @Test
+    void testsConvolutionsChannelMaxPooling() {
         float[][] input = new float[][] {
 /*00*/          {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 /*01*/          {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -15,8 +134,8 @@ public class PoolingTest {
 /*05*/          {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 /*06*/          {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 /*07*/          {0, 0, 0, 0, 0, 0, 84, 185, 159, 151, 60, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-/*08*/          {0, 0, 0, 0, 0, 0, 222, 254, 254, 254, 254, 241, 198, 198, 198, 198, 198, 198, 198, 198,170,52,0,0,0,0,0,0},
-/*09*/          {0, 0, 0, 0, 0, 0, 67, 114, 72, 114, 163, 227, 254, 225, 254, 254, 254, 250, 229, 254, 254,140,0,0,0,0,0,0},
+/*08*/          {0, 0, 0, 0, 0, 0, 222, 254, 254, 254, 254, 241, 198, 198, 198, 198,198,198,198,198,170,52,0,0,0,0,0,0},
+/*09*/          {0, 0, 0, 0, 0, 0, 67, 114, 72, 114, 163, 227, 254, 225, 254, 254, 254,250,229,254,254,140,0,0,0,0,0,0},
 /*10*/          {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 17, 66, 14, 67, 67, 67, 59, 21, 236, 254, 106, 0, 0, 0, 0, 0, 0},
 /*11*/          {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 83, 253, 209, 18, 0, 0, 0, 0, 0, 0},
 /*12*/          {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 22, 233, 255, 83, 0, 0, 0, 0, 0, 0, 0},
@@ -85,77 +204,90 @@ public class PoolingTest {
         final int POOL_SIZE= 2;
         Pooling p= new Pooling(POOL_SIZE, POOL_STRIDE, maxPool);
         p.poolChannel(c.getActivation()[0]);
-        Assert.assertArrayEquals(new float[]{42.904f,  57.547f, 21.180f,  37.763f}, p.accumulate(c.getActivation()[0], 4,  2),  DELTA);
-        Assert.assertArrayEquals(new float[]{0.0155f,   0.000f, 0.0155f,  0.0155f}, p.accumulate(c.getActivation()[0], 10, 6),  DELTA);
-        Assert.assertArrayEquals(new float[]{ 0.000f,   0.000f,  0.000f,  16.636f}, p.accumulate(c.getActivation()[0], 15, 16), DELTA);
-        Assert.assertArrayEquals(new float[]{ 6.166f,   0.031f,  0.189f,  0.0155f}, p.accumulate(c.getActivation()[0], 15, 18), DELTA);
-        Assert.assertArrayEquals(new float[]{67.670f, 113.974f, 99.312f,  89.251f}, p.accumulate(c.getActivation()[0], 16, 10), DELTA);
-        Assert.assertArrayEquals(new float[]{0.0155f,   0.000f, 0.0155f,  0.0155f}, p.accumulate(c.getActivation()[0], 10, 6),  DELTA);
-        Assert.assertArrayEquals(new float[]{0.0155f,   0.000f,  0.000f,   0.000f}, p.accumulate(c.getActivation()[0], 23, 23), DELTA);
+        Assert.assertArrayEquals(new float[]{42.904f,  57.547f, 21.180f,  37.763f},
+                                 p.accumulate(c.getActivation()[0], 4,  2),  DELTA);
+        Assert.assertArrayEquals(new float[]{0.0155f,   0.000f, 0.0155f,  0.0155f},
+                                 p.accumulate(c.getActivation()[0], 10, 6),  DELTA);
+        Assert.assertArrayEquals(new float[]{ 0.000f,   0.000f,  0.000f,  16.636f},
+                                 p.accumulate(c.getActivation()[0], 15, 16), DELTA);
+        Assert.assertArrayEquals(new float[]{ 6.166f,   0.031f,  0.189f,  0.0155f},
+                                 p.accumulate(c.getActivation()[0], 15, 18), DELTA);
+        Assert.assertArrayEquals(new float[]{67.670f, 113.974f, 99.312f,  89.251f},
+                                 p.accumulate(c.getActivation()[0], 16, 10), DELTA);
+        Assert.assertArrayEquals(new float[]{0.0155f,   0.000f, 0.0155f,  0.0155f},
+                                 p.accumulate(c.getActivation()[0], 10, 6),  DELTA);
+        Assert.assertArrayEquals(new float[]{0.0155f,   0.000f,  0.000f,   0.000f},
+                                 p.accumulate(c.getActivation()[0], 23, 23), DELTA);
+        Assert.assertArrayEquals(new float[]{30.205f,   21.186f, 115.24f, 118.097f},
+                                 p.accumulate(c.getActivation()[1], 3,  8),  DELTA);
+        Assert.assertArrayEquals(new float[]{86.102f,   88.461f, 82.126f, 102.705f},
+                                 p.accumulate(c.getActivation()[1], 8,  8),  DELTA);
+        Assert.assertArrayEquals(new float[]{0.239f,     0.413f,  1.496f,   0.000f},
+                                 p.accumulate(c.getActivation()[1], 20, 15),  DELTA);
+        Assert.assertArrayEquals(new float[]{39.236f,   71.407f, 13.771f,  28.452f},
+                                 p.accumulate(c.getActivation()[1], 8,  2),  DELTA);
+    }
 
-        Assert.assertArrayEquals(new float[]{30.205f,   21.186f, 115.24f, 118.097f}, p.accumulate(c.getActivation()[1], 3,  8),  DELTA);
-        Assert.assertArrayEquals(new float[]{86.102f,   88.461f, 82.126f, 102.705f}, p.accumulate(c.getActivation()[1], 8,  8),  DELTA);
-        Assert.assertArrayEquals(new float[]{0.239f,     0.413f,  1.496f,   0.000f}, p.accumulate(c.getActivation()[1], 20, 15),  DELTA);
-        Assert.assertArrayEquals(new float[]{39.236f,   71.407f, 13.771f,  28.452f}, p.accumulate(c.getActivation()[1], 8,  2),  DELTA);
+    @Test
+    void testsMaxPoolingA() {
+        final int POOL_SIZE=3, POOL_STRIDE=3;
+        final float[][] correctResul= {
+//                 0         1          2         3
+/* 0*/      {   16.000f,  23.000f,   34.000f,  33.000f},
+/* 1*/      {   26.000f,  33.000f,   24.500f,  16.000f}
+        };
+        final float[][] channel= {
+//              0       1        2        3        4        5        6         7        8        9       10       11
+/* 0*/      {2.000f, 6.000f,  7.000f, 23.000f,  2.000f,  8.000f,  8.000f,  16.000f,  7.000f, 22.000f,  2.000f,  8.000f},
+/* 1*/      {3.000f, 3.000f, 16.000f,  3.000f,  6.000f,  7.000f, 12.000f,  10.000f, 34.000f,  5.000f, 12.000f,  3.000f},
+/* 2*/      {5.000f, 8.000f,  2.000f,  5.000f, 22.000f,  6.000f,  9.000f,   1.000f, 12.000f, 33.000f, 11.000f,  7.000f},
+/* 3*/      {6.000f, 1.000f, 16.000f, 33.000f,  6.000f,  7.400f,  2.400f,  12.000f, 24.500f,  5.000f, 16.000f,  3.000f},
+/* 4*/      {2.000f, 2.000f, 26.000f, 23.000f,  7.000f,  7.300f,  2.300f,  11.500f, 14.500f, 15.000f,  2.000f,  5.000f},
+/* 5*/      {1.000f, 5.000f,  7.000f, 13.000f,  9.000f,  7.200f,  2.600f,  11.000f,  4.500f,  4.000f,  5.000f,  9.000f}
+        };
+        Func maxPool= param -> {
+            float result= 0f;
+            for(float f: param) {
+                if(f> result) {
+                    result= f;
+                }
+            }
+            return result;
+        };
+        Pooling p= new Pooling(POOL_SIZE, POOL_STRIDE, maxPool);
+        Assert.assertArrayEquals(correctResul[0], p.poolChannel(channel)[0], DELTA);
+        Assert.assertArrayEquals(correctResul[1], p.poolChannel(channel)[1], DELTA);
+    }
 
-        Assert.assertEquals(2.785f,   p.poolChannel(c.getActivation()[0])[6/POOL_STRIDE][6/POOL_STRIDE],  DELTA);
-        Assert.assertEquals(100.686f, p.poolChannel(c.getActivation()[0])[12/POOL_STRIDE][13/POOL_STRIDE],DELTA);
-        Assert.assertEquals(14.425f,  p.poolChannel(c.getActivation()[0])[18/POOL_STRIDE][16/POOL_STRIDE],DELTA);
-        Assert.assertEquals(0.267f,   p.poolChannel(c.getActivation()[0])[7/POOL_STRIDE][21/POOL_STRIDE], DELTA);
-        Assert.assertEquals(113.974f, p.poolChannel(c.getActivation()[0])[16/POOL_STRIDE][10/POOL_STRIDE],DELTA);
-        Assert.assertEquals(113.974f, p.poolChannel(c.getActivation()[0])[17/POOL_STRIDE][11/POOL_STRIDE],DELTA);
-
-        /* Der aktuelle Pooling-Prozess arbeitet mit einem POOL_SIZE von 2(=> 2x2) und POOL_STRIDE von 2,
-           sodass 4 quadratisch-benachbarte Werte aus activationLayer[][](c.getActivation()[0])
-           nach pooled-Channel zu einem(entspr. der Pooling-Aktivierungsfunktion) zusammengefasst werden */
-        Assert.assertEquals(73.433f, p.poolChannel(c.getActivation()[0])[16/POOL_STRIDE][13/POOL_STRIDE],DELTA);  //Wert activationLayer[16][13] wird nach poolChannel[8][6] zusammengefasst
-        Assert.assertEquals(73.433f, p.poolChannel(c.getActivation()[0])[16/POOL_STRIDE][12/POOL_STRIDE],DELTA);  //Wert activationLayer[16][12] wird nach poolChannel[8][6] zusammengefasst
-        Assert.assertEquals(73.432f, p.poolChannel(c.getActivation()[0])[17/POOL_STRIDE][12/POOL_STRIDE],DELTA);  //Wert activationLayer[17][12] wird nach poolChannel[8][6] zusammengefasst
-        Assert.assertEquals(73.432f, p.poolChannel(c.getActivation()[0])[17/POOL_STRIDE][13/POOL_STRIDE],DELTA);  //Wert activationLayer[17][13] wird nach poolChannel[8][6] zusammengefasst
-
-        Assert.assertEquals(73.306f, p.poolChannel(c.getActivation()[0])[10/POOL_STRIDE][12/POOL_STRIDE],DELTA);
-        Assert.assertEquals(73.306f, p.poolChannel(c.getActivation()[0])[10/POOL_STRIDE][13/POOL_STRIDE],DELTA);
-        Assert.assertEquals(73.306f, p.poolChannel(c.getActivation()[0])[11/POOL_STRIDE][12/POOL_STRIDE],DELTA);
-        Assert.assertEquals(73.306f, p.poolChannel(c.getActivation()[0])[11/POOL_STRIDE][13/POOL_STRIDE],DELTA);
-
-        Assert.assertEquals(51.714f, p.poolChannel(c.getActivation()[0])[16/POOL_STRIDE][9/POOL_STRIDE],DELTA);
-        Assert.assertEquals(51.714f, p.poolChannel(c.getActivation()[0])[16/POOL_STRIDE][8/POOL_STRIDE],DELTA);
-        Assert.assertEquals(51.714f, p.poolChannel(c.getActivation()[0])[17/POOL_STRIDE][9/POOL_STRIDE],DELTA);
-        Assert.assertEquals(51.714f, p.poolChannel(c.getActivation()[0])[17/POOL_STRIDE][8/POOL_STRIDE],DELTA);
-
-        Assert.assertEquals(126.863f, p.poolChannel(c.getActivation()[0])[18/POOL_STRIDE][9/POOL_STRIDE],DELTA);
-        Assert.assertEquals(126.863f, p.poolChannel(c.getActivation()[0])[18/POOL_STRIDE][8/POOL_STRIDE],DELTA);
-        Assert.assertEquals(126.863f, p.poolChannel(c.getActivation()[0])[19/POOL_STRIDE][9/POOL_STRIDE],DELTA);
-        Assert.assertEquals(126.863f, p.poolChannel(c.getActivation()[0])[19/POOL_STRIDE][8/POOL_STRIDE],DELTA);
-
-        Assert.assertEquals(0.0155f, p.poolChannel(c.getActivation()[0])[22/POOL_STRIDE][22/POOL_STRIDE],DELTA);
-        Assert.assertEquals(0.0155f, p.poolChannel(c.getActivation()[0])[22/POOL_STRIDE][23/POOL_STRIDE],DELTA);
-        Assert.assertEquals(0.0155f, p.poolChannel(c.getActivation()[0])[23/POOL_STRIDE][22/POOL_STRIDE],DELTA);
-        Assert.assertEquals(0.0155f, p.poolChannel(c.getActivation()[0])[23/POOL_STRIDE][23/POOL_STRIDE],DELTA);
-
-        Assert.assertEquals(85.572f, p.poolChannel(c.getActivation()[0])[22/POOL_STRIDE][8/POOL_STRIDE],DELTA);
-        Assert.assertEquals(85.572f, p.poolChannel(c.getActivation()[0])[22/POOL_STRIDE][9/POOL_STRIDE],DELTA);
-        Assert.assertEquals(85.572f, p.poolChannel(c.getActivation()[0])[23/POOL_STRIDE][8/POOL_STRIDE],DELTA);
-        Assert.assertEquals(85.572f, p.poolChannel(c.getActivation()[0])[23/POOL_STRIDE][9/POOL_STRIDE],DELTA);
-
-        Assert.assertEquals(102.705f, p.poolChannel(c.getActivation()[1])[8/POOL_STRIDE][8/POOL_STRIDE],DELTA);
-        Assert.assertEquals(102.705f, p.poolChannel(c.getActivation()[1])[8/POOL_STRIDE][9/POOL_STRIDE],DELTA);
-        Assert.assertEquals(102.705f, p.poolChannel(c.getActivation()[1])[9/POOL_STRIDE][8/POOL_STRIDE],DELTA);
-        Assert.assertEquals(102.705f, p.poolChannel(c.getActivation()[1])[9/POOL_STRIDE][9/POOL_STRIDE],DELTA);
-
-        Assert.assertEquals(1.029f, p.poolChannel(c.getActivation()[1])[18/POOL_STRIDE][16/POOL_STRIDE],DELTA);
-        Assert.assertEquals(1.029f, p.poolChannel(c.getActivation()[1])[18/POOL_STRIDE][17/POOL_STRIDE],DELTA);
-        Assert.assertEquals(1.029f, p.poolChannel(c.getActivation()[1])[19/POOL_STRIDE][16/POOL_STRIDE],DELTA);
-        Assert.assertEquals(1.029f, p.poolChannel(c.getActivation()[1])[19/POOL_STRIDE][17/POOL_STRIDE],DELTA);
-
-        Assert.assertEquals(20.369f, p.poolChannel(c.getActivation()[1])[4/POOL_STRIDE][20/POOL_STRIDE],DELTA);
-        Assert.assertEquals(20.369f, p.poolChannel(c.getActivation()[1])[4/POOL_STRIDE][21/POOL_STRIDE],DELTA);
-        Assert.assertEquals(20.369f, p.poolChannel(c.getActivation()[1])[5/POOL_STRIDE][20/POOL_STRIDE],DELTA);
-        Assert.assertEquals(20.369f, p.poolChannel(c.getActivation()[1])[5/POOL_STRIDE][21/POOL_STRIDE],DELTA);
-
-        Assert.assertEquals(39.965f, p.poolChannel(c.getActivation()[1])[2/POOL_STRIDE][2/POOL_STRIDE],DELTA);
-        Assert.assertEquals(39.965f, p.poolChannel(c.getActivation()[1])[2/POOL_STRIDE][3/POOL_STRIDE],DELTA);
-        Assert.assertEquals(39.965f, p.poolChannel(c.getActivation()[1])[3/POOL_STRIDE][2/POOL_STRIDE],DELTA);
-        Assert.assertEquals(39.965f, p.poolChannel(c.getActivation()[1])[3/POOL_STRIDE][3/POOL_STRIDE],DELTA);
+    @Test
+    void testsMaxPoolingB() {
+        final int POOL_SIZE=3, POOL_STRIDE=3;
+        final float[][] correctResul= {
+//                 0         1          2         3
+/* 0*/      {   16.000f,  23.000f,   34.000f,  33.000f},
+/* 1*/      {   26.000f,  33.000f,   24.500f,  16.000f}
+        };
+        final float[][] channel= {
+//              0       1        2        3        4        5        6         7        8        9       10       11
+/* 0*/      {2.000f, 6.000f,  7.000f, 23.000f,  2.000f,  8.000f,  8.000f,  16.000f,  7.000f, 22.000f,  2.000f,  8.000f},
+/* 1*/      {3.000f, 3.000f, 16.000f,  3.000f,  6.000f,  7.000f, 12.000f,  10.000f, 34.000f,  5.000f, 12.000f,  3.000f},
+/* 2*/      {5.000f, 8.000f,  2.000f,  5.000f, 22.000f,  6.000f,  9.000f,   1.000f, 12.000f, 33.000f, 11.000f,  7.000f},
+/* 3*/      {6.000f, 1.000f, 16.000f, 33.000f,  6.000f,  7.400f,  2.400f,  12.000f, 24.500f,  5.000f, 16.000f,  3.000f},
+/* 4*/      {2.000f, 2.000f, 26.000f, 23.000f,  7.000f,  7.300f,  2.300f,  11.500f, 14.500f, 15.000f,  2.000f,  5.000f},
+/* 5*/      {1.000f, 5.000f,  7.000f, 13.000f,  9.000f,  7.200f,  2.600f,  11.000f,  4.500f,  4.000f,  5.000f,  9.000f},
+/* 6*/      {1.000f, 5.000f,  7.000f, 13.000f,  9.000f,  7.200f,  2.600f,  11.000f,  4.500f,  4.000f,  5.000f,  9.000f}
+        };
+        Func maxPool= param -> {
+            float result= 0f;
+            for(float f: param) {
+                if(f> result) {
+                    result= f;
+                }
+            }
+            return result;
+        };
+        Pooling p= new Pooling(POOL_SIZE, POOL_STRIDE, maxPool);
+        Assert.assertArrayEquals(correctResul[0], p.poolChannel(channel)[0], DELTA);
+        Assert.assertArrayEquals(correctResul[1], p.poolChannel(channel)[1], DELTA);
     }
 }

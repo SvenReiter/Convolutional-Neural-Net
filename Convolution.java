@@ -10,38 +10,50 @@ public class Convolution {
         for(int filterId=0; filterId<filters.length; filterId++) {
             for(int rowInput=0; rowInput<input.length-fSizeCol+1; rowInput+=stride) {
                 for(int colInput=0; colInput<input[rowInput].length-fSizeRow+1; colInput+=stride) {
-                    matMulRes= matMul(input, filters[filterId], rowInput, colInput, stride);
+                    matMulRes= matMul(input, filters[filterId], rowInput, colInput);
                     sumUpMatValRes= sumUpMatVal(matMulRes);
                     sumUpMatValRes+= biases[filterId];
-                    activation[filterId][rowInput][colInput]= activationFunc.calc(sumUpMatValRes);
+                    activation[filterId][rowInput][colInput]+= activationFunc.calc(sumUpMatValRes);
                 }
             }
-            // TODO: 05.10.2024 yt-video(Convolutional Neural Networks from Scratch | In Depth/ Conv Layer 2)
         }
+        /* TODO: 06.10.2024
+            Das Pooling funktioniert und das Max-Pooling-Resultat stimmt auch mit dem des YT-Videos überein
+            Der Algorithmus Convolution(...) muss nur geändert oder überladen werden:
+                Convolution on Multiple Channels | Layer 2
+                .
+                zB. könnte man den Convolutions Konstruktor überladen:
+                    Für Convolution on Multiple Channels | Layer 1
+                    Convolution(float[][]input, float[][]filters, int fSizeCol, int fSizeRow, float[]biases, Func activationFunc, int stride)
+                    Und für Convolution on Multiple Channels | Layer 2
+                    Convolution(float[][]input, float[][][]filters, int fSizeCol, int fSizeRow, float[]biases, Func activationFunc, int stride)
+                        Hierfür muss ich mir eine Lösung überlegen
+         */
     }
 
     /**
-     * @pre
-     * @param input
-     * @param filter
-     * @param row
-     * @param col
-     * @param stride
-     * @return
-     */
-    public float[][] matMul(float[][]input, float[][]filter, int row, int col, int stride) {
+     * Cellular multiplication of respectively elements rather scalar multiplication of.
+     * @param input picture pixel wise.
+     * @param filter the convolutions filter.
+     * @param row the specific inputs row of area to be convoluted.
+     * @param col the specific inputs column of area to be convoluted.
+     * @return multiplication of respectively elements of filter[][], input[][]. */
+    public float[][] matMul(float[][]input, float[][]filter, int row, int col) {
         float[][]result= new float[filter.length][filter[0].length];
         for(int r=0; r<filter.length; r++) {
+            if((row+r)>(input.length-1)) continue;
             for(int c=0; c<filter[0].length; c++) {
-                if((row+r)>(input.length-1) || (col+c)>(input[0].length-1))
-                    continue;
+                if((col+c)>(input[0].length-1)) continue;
                 result[r][c] = filter[r][c] * input[row + r][col + c];
-
             }
         }
         return result;
     }
 
+    /**
+     * Sums up sequence's elements.
+     * @param mat the sequence of elements to sum.
+     * @return The sum of all elements from mat. */
     public float sumUpMatVal(float[][]mat) {
         float result=0;
         for(int r=0; r<mat.length; r++) {
