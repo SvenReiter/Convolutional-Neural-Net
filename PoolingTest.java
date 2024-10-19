@@ -70,15 +70,15 @@ public class PoolingTest {
         Pooling p = new Pooling(2, STRIDE, maxPool);
         Assert.assertEquals(28, input.length);
         Assert.assertEquals(28, input[0].length);
-        Assert.assertEquals(24, c.getActivation()[0].length);
-        Assert.assertEquals(24, c.getActivation()[0][0].length);
-        float[][] pooledDecreasedChannelA = p.poolChannel(c.getActivation()[0]);
+        Assert.assertEquals(24, c.getActivationSeq()[0].length);
+        Assert.assertEquals(24, c.getActivationSeq()[0][0].length);
+        float[][] pooledDecreasedChannelA = p.poolChannel(c.getActivationSeq()[0]);
         Assert.assertEquals(12, pooledDecreasedChannelA.length);
         Assert.assertEquals(12, pooledDecreasedChannelA[0].length);
 
-        Assert.assertEquals(24, c.getActivation()[1].length);
-        Assert.assertEquals(24, c.getActivation()[1][0].length);
-        float[][] pooledDecreasedChannelB = p.poolChannel(c.getActivation()[1]);
+        Assert.assertEquals(24, c.getActivationSeq()[1].length);
+        Assert.assertEquals(24, c.getActivationSeq()[1][0].length);
+        float[][] pooledDecreasedChannelB = p.poolChannel(c.getActivationSeq()[1]);
         Assert.assertEquals(12, pooledDecreasedChannelB.length);
         Assert.assertEquals(12, pooledDecreasedChannelB[0].length);
 
@@ -97,7 +97,6 @@ public class PoolingTest {
 /* 9*/      {0.0155f, 0.0155f, 0.0155f, 26.057f, 126.863f,  93.122f,   0.000f,  0.556f,14.425f,0.0155f,0.0155f,0.0155f},
 /*10*/      {0.0155f, 0.0155f, 0.0155f, 74.583f, 120.204f,  45.411f,   0.000f, 5.937f, 0.121f,0.0155f,0.0155f,0.0155f},
 /*11*/      {0.0155f, 0.0155f, 0.0155f, 95.059f,  85.572f,   0.000f,   0.000f,  6.648f,0.0155f,0.0155f,0.0155f,0.0155f},
-
         };
 
         //The lower channel of Max Pooling | Layer 1 result
@@ -203,29 +202,29 @@ public class PoolingTest {
         final int POOL_STRIDE=2;
         final int POOL_SIZE= 2;
         Pooling p= new Pooling(POOL_SIZE, POOL_STRIDE, maxPool);
-        p.poolChannel(c.getActivation()[0]);
+        p.poolChannel(c.getActivationSeq()[0]);
         Assert.assertArrayEquals(new float[]{42.904f,  57.547f, 21.180f,  37.763f},
-                                 p.accumulate(c.getActivation()[0], 4,  2),  DELTA);
+                                 p.accumulate(c.getActivationSeq()[0], 4,  2),  DELTA);
         Assert.assertArrayEquals(new float[]{0.0155f,   0.000f, 0.0155f,  0.0155f},
-                                 p.accumulate(c.getActivation()[0], 10, 6),  DELTA);
+                                 p.accumulate(c.getActivationSeq()[0], 10, 6),  DELTA);
         Assert.assertArrayEquals(new float[]{ 0.000f,   0.000f,  0.000f,  16.636f},
-                                 p.accumulate(c.getActivation()[0], 15, 16), DELTA);
+                                 p.accumulate(c.getActivationSeq()[0], 15, 16), DELTA);
         Assert.assertArrayEquals(new float[]{ 6.166f,   0.031f,  0.189f,  0.0155f},
-                                 p.accumulate(c.getActivation()[0], 15, 18), DELTA);
+                                 p.accumulate(c.getActivationSeq()[0], 15, 18), DELTA);
         Assert.assertArrayEquals(new float[]{67.670f, 113.974f, 99.312f,  89.251f},
-                                 p.accumulate(c.getActivation()[0], 16, 10), DELTA);
+                                 p.accumulate(c.getActivationSeq()[0], 16, 10), DELTA);
         Assert.assertArrayEquals(new float[]{0.0155f,   0.000f, 0.0155f,  0.0155f},
-                                 p.accumulate(c.getActivation()[0], 10, 6),  DELTA);
+                                 p.accumulate(c.getActivationSeq()[0], 10, 6),  DELTA);
         Assert.assertArrayEquals(new float[]{0.0155f,   0.000f,  0.000f,   0.000f},
-                                 p.accumulate(c.getActivation()[0], 23, 23), DELTA);
+                                 p.accumulate(c.getActivationSeq()[0], 23, 23), DELTA);
         Assert.assertArrayEquals(new float[]{30.205f,   21.186f, 115.24f, 118.097f},
-                                 p.accumulate(c.getActivation()[1], 3,  8),  DELTA);
+                                 p.accumulate(c.getActivationSeq()[1], 3,  8),  DELTA);
         Assert.assertArrayEquals(new float[]{86.102f,   88.461f, 82.126f, 102.705f},
-                                 p.accumulate(c.getActivation()[1], 8,  8),  DELTA);
+                                 p.accumulate(c.getActivationSeq()[1], 8,  8),  DELTA);
         Assert.assertArrayEquals(new float[]{0.239f,     0.413f,  1.496f,   0.000f},
-                                 p.accumulate(c.getActivation()[1], 20, 15),  DELTA);
+                                 p.accumulate(c.getActivationSeq()[1], 20, 15),  DELTA);
         Assert.assertArrayEquals(new float[]{39.236f,   71.407f, 13.771f,  28.452f},
-                                 p.accumulate(c.getActivation()[1], 8,  2),  DELTA);
+                                 p.accumulate(c.getActivationSeq()[1], 8,  2),  DELTA);
     }
 
     @Test

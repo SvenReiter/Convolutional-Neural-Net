@@ -56,11 +56,11 @@ public class ConvolutionTest {
         Func reLu = x -> (x[0] > 0) ? x[0] : 0;
         int stride = 1;
         Convolution c = new Convolution(input, filters, 5, 5, biases, reLu, stride);
-        Assert.assertArrayEquals(new float[]{0.0f, 0.0f, 0.0f, 0.0f, 0.0f}, c.matMul(input, filters[0], 7,14)[0], DELTA);
-        Assert.assertArrayEquals(new float[]{20.394f, -68.31f, 43.56f, 1.9799999f, 27.126f}, c.matMul(input, filters[0], 7,14)[1], DELTA);
-        Assert.assertArrayEquals(new float[]{7.112f, -65.786f, -27.432001f, -19.25f, 32.06f}, c.matMul(input, filters[0], 7,14)[2], DELTA);
-        Assert.assertArrayEquals(new float[]{-5.2260003f, -4.154f, 1.407f, -0.885f, -0.378f}, c.matMul(input, filters[0], 7,14)[3], DELTA);
-        Assert.assertArrayEquals(new float[]{0.0f, 0.0f, 0.0f, 0.0f, 16.6f}, c.matMul(input, filters[0], 7,14)[4], DELTA);
+        Assert.assertArrayEquals(new float[]{0.0f, 0.0f, 0.0f, 0.0f, 0.0f}, c.matMulElmWise(input, filters[0], 7,14)[0], DELTA);
+        Assert.assertArrayEquals(new float[]{20.394f, -68.31f, 43.56f, 1.9799999f, 27.126f}, c.matMulElmWise(input, filters[0], 7,14)[1], DELTA);
+        Assert.assertArrayEquals(new float[]{7.112f, -65.786f, -27.432001f, -19.25f, 32.06f}, c.matMulElmWise(input, filters[0], 7,14)[2], DELTA);
+        Assert.assertArrayEquals(new float[]{-5.2260003f, -4.154f, 1.407f, -0.885f, -0.378f}, c.matMulElmWise(input, filters[0], 7,14)[3], DELTA);
+        Assert.assertArrayEquals(new float[]{0.0f, 0.0f, 0.0f, 0.0f, 16.6f}, c.matMulElmWise(input, filters[0], 7,14)[4], DELTA);
     }
 
     @Test
@@ -116,8 +116,8 @@ public class ConvolutionTest {
         int stride = 1;
         Convolution c = new Convolution(input, filters, 5, 5, biases, reLu, stride);
 
-        Assert.assertEquals(-41.182f, c.sumUpMatVal(c.matMul(input, filters[0], 7,14)), DELTA);
-        Assert.assertEquals(-41.1665f, c.sumUpMatVal(c.matMul(input, filters[0], 7,14))+ biases[0], DELTA);
+        Assert.assertEquals(-41.182f, c.sumUpMatVal(c.matMulElmWise(input, filters[0], 7,14)), DELTA);
+        Assert.assertEquals(-41.1665f, c.sumUpMatVal(c.matMulElmWise(input, filters[0], 7,14))+ biases[0], DELTA);
     }
 
     @Test
@@ -232,8 +232,8 @@ public class ConvolutionTest {
 /*24*/      {   0.0f,   0.000f,  0.000f,  0.000f,  0.000f,  0.000f,  0.000f,  0.000f,  0.000f,  0.000f,   0.000f,  0.000f,  0.000f,  0.000f,  0.000f,  0.000f,  0.000f,  0.000f,  0.000f,  0.000f,  0.000f,  0.000f,  0.000f,  0.000f},
         };
         for(int i=0; i<24; i++) {
-            Assert.assertArrayEquals(resultActivationLayerA[i], c.getActivation()[0][i], DELTA);
-            Assert.assertArrayEquals(resultActivationLayerB[i], c.getActivation()[1][i], DELTA);
+            Assert.assertArrayEquals(resultActivationLayerA[i], c.getActivationSeq()[0][i], DELTA);
+            Assert.assertArrayEquals(resultActivationLayerB[i], c.getActivationSeq()[1][i], DELTA);
         }
     }
 
@@ -284,10 +284,10 @@ public class ConvolutionTest {
                 {0.111f, -0.035f, 0.197f, 0.183f, 0.136f}
             }
         };
-        float[] biases = new float[]{0.0155f, -0.567f};
-        Func reLu = x -> (x[0] > 0) ? x[0] : 0;
-        int STRIDE = 1;
-        Convolution c = new Convolution(input, filters, 5, 5,biases, reLu, STRIDE);
+        final float[] biases = new float[]{0.0155f, -0.567f};
+        final Func reLu = x -> (x[0] > 0) ? x[0] : 0;
+        final int  CONVOLUTION_STRIDE= 1;
+        Convolution c = new Convolution(input, filters, 5, 5,biases, reLu, CONVOLUTION_STRIDE);
         Func maxPool= param -> {
             float result= 0f;
             for(float f: param) {
@@ -297,22 +297,127 @@ public class ConvolutionTest {
             }
             return result;
         };
-
-        Pooling p= new Pooling(2, STRIDE, maxPool);
+        final int POOL_STRIDE= 2, POOL_SIZE= 2;
+        Pooling p= new Pooling(POOL_SIZE, POOL_STRIDE, maxPool);
         Assert.assertEquals(28, input.length);
         Assert.assertEquals(28, input[0].length);
-        Assert.assertEquals(24, c.getActivation()[0].length);
-        Assert.assertEquals(24, c.getActivation()[0][0].length);
-        float[][] pooledDecreasedChannelA= p.poolChannel(c.getActivation()[0]);
+        Assert.assertEquals(24, c.getActivationSeq()[0].length);
+        Assert.assertEquals(24, c.getActivationSeq()[0].length);
+        final float[][] pooledDecreasedChannelA= p.poolChannel(c.getActivationSeq()[0]);
         Assert.assertEquals(12, pooledDecreasedChannelA.length);
         Assert.assertEquals(12, pooledDecreasedChannelA[0].length);
 
-        Assert.assertEquals(24, c.getActivation()[1].length);
-        Assert.assertEquals(24, c.getActivation()[1][0].length);
-        float[][] pooledDecreasedChannelB= p.poolChannel(c.getActivation()[1]);
+        Assert.assertEquals(24, c.getActivationSeq()[1].length);
+        Assert.assertEquals(24, c.getActivationSeq()[0].length);
+        final float[][] pooledDecreasedChannelB= p.poolChannel(c.getActivationSeq()[1]);
         Assert.assertEquals(12, pooledDecreasedChannelB.length);
         Assert.assertEquals(12, pooledDecreasedChannelB[0].length);
+        //Das Ergebnis sieht korrekt aus(Die Zellen der beiden Abbildungen[~7:02] links entspr. den errechneten Werten
+        final Func sigmoid= x-> (float)(1 / (1 + Math.exp(-x[0])));
 
-        // TODO: 10.10.2024 Weiter im YT-Clip "Convolution on Multiple Channels | Layer 2"
+        //Stacked filters(4*2):= 4 filters with respectively 2 channels
+        //<pooledDecreasedChannelA>s Convolution: <stackedFilterChannelA>s weights
+        //<pooledDecreasedChannelB>s Convolution: <stackedFilterChannelB>s weights
+        /* TODO: 16.10.2024 Stacked filters beneath are right but not the way of using them!!!
+            ich muss für diesen Kontext für Channel[0] iterieren: stackedFilterChannelA[0], stackedFilterChannelB[0]
+                                        für Channel[1] iterieren: stackedFilterChannelA[1], stackedFilterChannelB[1]
+                                        für Channel[2] iterieren: stackedFilterChannelA[2], stackedFilterChannelB[2]
+                                        für Channel[3] iterieren: stackedFilterChannelA[3], stackedFilterChannelB[3]
+            Die Sequenz ist ungünstig arrangiert
+            Im YT-Bsp gibt es 4 Filter-Stacks mit jeweils 2 Filtern(3x3) => 4x2x3x3
+            pooledDecreasedChannelA[][] und pooledDecreasedChannelB[][] müssen zusammengefasst an Convolution() übergeben werden
+            => [][]input-> [][][]input in Convolution()-Konstruktor-Paramlist
+         */
+        float[][][] pooledDecreasedChannels= new float[][][]{   p.poolChannel(c.getActivationSeq()[0]),
+                                                                p.poolChannel(c.getActivationSeq()[1])};
+        final float[][][] pooledDecreasedChannelsFromClip= new float[][][]{
+            new float[][]{
+                {4.0f, 0.4f,    0.2f,   0.2f,   0.2f,   0.2f,   0.2f,   0.2f,   0.2f,  0.2f,  0.2f, 0.2f},
+                {0.2f, 41.5f,  60.5f,  42.8f,  10.8f,   0.2f,   0.2f,   0.2f,   0.2f,  0.2f,  0.2f, 0.2f},
+                {0.2f, 57.7f,  94.7f,  75.9f,  62.8f,  67.8f,  72.4f,  72.4f,  66.8f, 22.8f,  0.0f, 0.2f},
+                {0.2f, 41.6f,  69.3f,   2.6f,   0.0f,   0.0f,   0.0f,   0.0f,   0.0f,  0.0f,  0.4f, 0.2f},
+                {0.2f,  0.9f,   3.3f,   5.7f,  11.2f,   0.0f,   3.7f,  79.0f,  44.3f,  0.0f, 16.2f, 0.2f},
+                {0.2f,  0.2f,   0.2f,   0.2f,   0.8f,   0.2f,  73.4f, 104.8f,  23.0f,  0.0f,  9.1f, 0.2f},
+                {0.2f,  0.2f,   0.2f,   0.2f,   0.2f,  25.2f, 100.8f,  63.1f,   0.0f,  5.1f,  4.9f, 0.2f},
+                {0.2f,  0.2f,   0.2f,   0.2f,   4.0f,  77.1f, 101.6f,  37.7f,   0.0f, 15.2f,  0.2f, 0.2f},
+                {0.2f,  0.2f,   0.2f,   0.2f,  51.9f, 113.1f,  73.6f,   0.0f,  16.6f,  0.3f,  0.2f, 0.2f},
+                {0.2f,  0.2f,   0.2f,  26.2f, 126.8f,  93.0f,   0.0f,   0.5f,  14.4f,  0.2f,  0.2f, 0.2f},
+                {0.2f,  0.2f,   0.2f,  74.7f, 120.1f,  45.3f,   0.0f,   6.0f,   0.3f,  0.2f,  0.2f, 0.2f},
+                {0.2f,  0.2f,   0.2f,  95.1f,  85.4f,   0.0f,   0.0f,   6.8f,   0.2f,  0.2f,  0.2f, 0.2f}
+            },
+            new float[][]{
+                {6.3f,  5.4f,   0.0f,   0.0f,   0.0f,   0.0f,   0.0f,   0.0f,   0.0f,  0.0f,  0.0f, 0.0f},
+                {0.0f, 39.9f,  82.6f,  69.6f,  30.3f,   4.9f,   0.0f,   0.0f,   0.0f,  0.0f,  0.0f, 0.0f},
+                {0.0f, 23.5f,  44.9f,  90.0f, 118.2f, 121.4f, 116.8f, 116.8f, 113.0f, 57.7f, 20.4f, 0.0f},
+                {0.0f, 10.6f,  14.0f,   0.0f,   0.0f,   0.0f,   0.0f,   0.0f,   0.0f,  0.0f,  0.0f, 0.0f},
+                {0.0f, 71.3f, 102.4f, 105.9f, 102.5f, 108.4f, 124.7f,  83.1f,   0.0f,  0.0f,  0.0f, 0.0f},
+                {0.0f,  0.0f,   0.0f,   3.1f,  14.7f,  23.4f,  33.6f,   0.0f,   0.0f,  0.0f,  0.7f, 0.0f},
+                {0.0f,  0.0f,   0.0f,   0.0f,   0.0f,  14.6f,   0.0f,   0.0f,   0.0f,  1.6f,  0.7f, 0.0f},
+                {0.0f,  0.0f,   0.0f,   0.0f,   2.0f,  17.0f,   0.0f,   0.0f,   0.0f,  0.7f,  0.0f, 0.0f},
+                {0.0f,  0.0f,   0.0f,   0.0f,  23.4f,   0.0f,   0.0f,   0.0f,   0.0f,  1.0f,  0.0f, 0.0f},
+                {0.0f,  0.0f,   0.0f,  10.8f,  26.3f,   0.0f,   0.0f,   0.0f,   1.0f,  0.0f,  0.0f, 0.0f},
+                {0.0f,  0.0f,   0.0f,   7.7f,   0.0f,   0.0f,   0.0f,   1.5f,   0.4f,  0.0f,  0.0f, 0.0f},
+                {0.0f,  0.0f,   0.0f,   0.0f,   0.0f,   0.0f,   0.0f,   0.0f,   0.0f,  0.0f,  0.0f, 0.0f}
+            }
+        };
+
+        final float[][][]filterStackA= new float[][][] {
+                {
+                        {-0.442f, -0.124f, -0.237f},
+                        {-0.121f, -0.207f, -0.136f},
+                        {0.104f, 0.04f, 0.207f}
+                }, {
+                        {0.2f, 0.011f, 0.163f},
+                        {0.019f, -0.027f, 0.178f},
+                        {-0.172f, -0.068f, 0.037f}
+                }
+        };
+        final float[][][]filterStackB= new float[][][] {
+                {
+                        {0.1f, 0.04f, 0.067f},
+                        {-0.174f, 0.05f, -0.063f},
+                        {-0.025f, -0.073f, -0.248f}
+                }, {
+                        {-0.075f, 0.217f, 0.155f},
+                        {-0.134f, 0.068f, 0.114f},
+                        {0.024f, 0.155f, 0.18f}
+                }
+        };
+        final float[][][]filterStackC= new float[][][] {
+                {
+                        {-0.121f, -0.114f, -0.109f},
+                        {0.238f, 0.273f, 0.007f},
+                        {-0.065f, 0.0f, 0.102f}
+                }, {
+                        {-0.036f, -0.167f, -0.04f},
+                        {0.064f, -0.025f, -0.094f},
+                        {0.478f, 0.113f, -0.089f}
+                }
+        };
+        final float[][][]filterStackD= new float[][][] {
+                {
+                        {-0.022f, -0.03f, 0.072f},
+                        {0.113f, 0.095f, -0.037f},
+                        {0.067f, -0.006f, 0.172f}
+                }, {
+                        {-0.016f, 0.099f, -0.688f},
+                        {0.005f, -0.157f, -0.238f},
+                        {-0.061f, -0.13f, -0.186f}
+                }
+        };
+        final float[]filtersBiases= new float[]{-1.069f, -2.87f, -2.963f, -0.212f};
+
+        Convolution cChannelsA= new Convolution(pooledDecreasedChannelsFromClip, filterStackA,
+                3, 3, filtersBiases[0], sigmoid, CONVOLUTION_STRIDE);
+
+        Convolution cChannelsB= new Convolution(pooledDecreasedChannelsFromClip, filterStackB,
+                3, 3, filtersBiases[1], sigmoid, CONVOLUTION_STRIDE);
+
+        Convolution cChannelsC= new Convolution(pooledDecreasedChannelsFromClip, filterStackC,
+                3, 3, filtersBiases[2], sigmoid, CONVOLUTION_STRIDE);
+
+        Convolution cChannelsD= new Convolution(pooledDecreasedChannelsFromClip, filterStackD,
+                3, 3, filtersBiases[3], sigmoid, CONVOLUTION_STRIDE);
+        System.out.println();
     }
 }
