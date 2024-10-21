@@ -1,6 +1,7 @@
 
 public class Convolution {
     private float[][][] activationSeq;             //a sequence of resulting channels
+
     private float[][] activation;             //the resulting sequence
 
     /**
@@ -9,23 +10,22 @@ public class Convolution {
      * @param filters
      * @param fSizeCol
      * @param fSizeRow
-     * @param biases
+     * @param bias
      * @param activationFunc
      * @param stride
-     * @pre filters.length==input.length
-     */
+     * @pre filters.length==input.length */
     public Convolution(float[][][]input, float[][][]filters, int fSizeCol, int fSizeRow, float bias, Func activationFunc, int stride) {
         activationSeq= new float[filters.length][input[0].length-fSizeRow+1][input[0][0].length-fSizeCol+1];
         activation= new float[input[0].length-fSizeRow+1][input[0][0].length-fSizeCol+1];
         float[][]matMulRes;
-                                                                       //iterates the channels
+
         for(int rowInput=0; rowInput<activationSeq[0].length; rowInput+=stride) {                                       //iterates rows of a channel
             for (int colInput=0; colInput<activationSeq[0][rowInput].length; colInput+=stride) {                        //iterates columns of a channels row
-                for(int filterId=0; filterId<filters.length; filterId++) {                                              //iterates the given filterstack
+                for(int filterId=0; filterId<filters.length; filterId++) {                                              //iterates the given filterstack and channels, because filters.length, input.length are equal
                     matMulRes = matMulElmWise(input[filterId], filters[filterId], rowInput, colInput);                  //writes result of (input[i]*filters[filterId] at[rowInput, colInput]) to matMulRes
-                    // TODO: 18.10.2024 Der erste Unterschied ist, dass matMulElmWise(...) seine Werte auf 2 Nachkommastellen rundet (=> -23.4856 wird -23.49)
+                    // TODO: 18.10.2024 Der erste Unterschied ist, dass matMulElmWise(...) seine Werte auf 2 Nachkommastellen rundet(=> -23.4856 wird -23.49)
 
-                                                               // SUMME(k,i)   in YT-Tutorial(8:38)
+                    //                                            SUMME(k,i)   in YT-Tutorial(8:38)
                     activationSeq[filterId][rowInput][colInput]+= sumUpMatVal(matMulRes);                               //sums up values of matMulRes to corresponding elm
                 }
             }
@@ -34,8 +34,7 @@ public class Convolution {
         for(int filterId=0; filterId<filters.length; filterId++) {
             for (int r=0; r<activationSeq[filterId].length; r++) {
                 for (int c=0; c<activationSeq[filterId][r].length; c++) {
-
-                                    // SUMME(c,j)   in YT-Tutorial(8:38)
+                    //                 SUMME(c,j)   in YT-Tutorial(8:38)
                     activation[r][c]+= activationSeq[filterId][r][c];
                 }
             }
@@ -43,25 +42,21 @@ public class Convolution {
 
         for (int r=0; r<activationSeq[0].length; r++) {
             for (int c=0; c<activationSeq[0][r].length; c++) {
-
-                // + b   in YT-Tutorial(8:38)
+                //              + b   in YT-Tutorial(8:38)
                 activation[r][c]+= bias;
             }
         }
-        System.out.println();
+        
         for (int r=0; r<activationSeq[0].length; r++) {
             for (int c=0; c<activationSeq[0][r].length; c++) {
-
-                // s(zi)   in YT-Tutorial(8:38)
+                //              = s(zi)   in YT-Tutorial(8:38)
                 activation[r][c]= activationFunc.calc(activation[r][c]);
             }
         }
-        System.out.println();
     }
 
     public Convolution(float[][]input, float[][][]filters, int fSizeCol, int fSizeRow, float[]biases, Func activationFunc, int stride) {
         activationSeq= new float[filters.length][input.length-fSizeRow+1][input[0].length-fSizeCol+1];                  //(+1):= weil das erste mapping(an Position[0]) ansonsten übersprungen würde
-
         float[][]matMulRes;
         for(int rowInput=0; rowInput<input.length-fSizeCol+1; rowInput+=stride) {
             for(int colInput=0; colInput<input[rowInput].length-fSizeRow+1; colInput+=stride) {
@@ -119,5 +114,9 @@ public class Convolution {
 
     public float[][][] getActivationSeq() {
         return activationSeq;
+    }
+
+    public float[][] getActivation() {
+        return activation;
     }
 }

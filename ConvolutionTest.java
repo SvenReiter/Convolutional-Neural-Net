@@ -1,4 +1,5 @@
 import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class ConvolutionTest {
@@ -287,7 +288,7 @@ public class ConvolutionTest {
         final float[] biases = new float[]{0.0155f, -0.567f};
         final Func reLu = x -> (x[0] > 0) ? x[0] : 0;
         final int  CONVOLUTION_STRIDE= 1;
-        Convolution c = new Convolution(input, filters, 5, 5,biases, reLu, CONVOLUTION_STRIDE);
+        Convolution conv = new Convolution(input, filters, 5, 5,biases, reLu, CONVOLUTION_STRIDE);
         Func maxPool= param -> {
             float result= 0f;
             for(float f: param) {
@@ -301,36 +302,21 @@ public class ConvolutionTest {
         Pooling p= new Pooling(POOL_SIZE, POOL_STRIDE, maxPool);
         Assert.assertEquals(28, input.length);
         Assert.assertEquals(28, input[0].length);
-        Assert.assertEquals(24, c.getActivationSeq()[0].length);
-        Assert.assertEquals(24, c.getActivationSeq()[0].length);
-        final float[][] pooledDecreasedChannelA= p.poolChannel(c.getActivationSeq()[0]);
+        Assert.assertEquals(24, conv.getActivationSeq()[0].length);
+        Assert.assertEquals(24, conv.getActivationSeq()[0].length);
+        final float[][] pooledDecreasedChannelA= p.poolChannel(conv.getActivationSeq()[0]);
         Assert.assertEquals(12, pooledDecreasedChannelA.length);
         Assert.assertEquals(12, pooledDecreasedChannelA[0].length);
 
-        Assert.assertEquals(24, c.getActivationSeq()[1].length);
-        Assert.assertEquals(24, c.getActivationSeq()[0].length);
-        final float[][] pooledDecreasedChannelB= p.poolChannel(c.getActivationSeq()[1]);
+        Assert.assertEquals(24, conv.getActivationSeq()[1].length);
+        Assert.assertEquals(24, conv.getActivationSeq()[0].length);
+        final float[][] pooledDecreasedChannelB= p.poolChannel(conv.getActivationSeq()[1]);
         Assert.assertEquals(12, pooledDecreasedChannelB.length);
         Assert.assertEquals(12, pooledDecreasedChannelB[0].length);
-        //Das Ergebnis sieht korrekt aus(Die Zellen der beiden Abbildungen[~7:02] links entspr. den errechneten Werten
+
         final Func sigmoid= x-> (float)(1 / (1 + Math.exp(-x[0])));
 
-        //Stacked filters(4*2):= 4 filters with respectively 2 channels
-        //<pooledDecreasedChannelA>s Convolution: <stackedFilterChannelA>s weights
-        //<pooledDecreasedChannelB>s Convolution: <stackedFilterChannelB>s weights
-        /* TODO: 16.10.2024 Stacked filters beneath are right but not the way of using them!!!
-            ich muss für diesen Kontext für Channel[0] iterieren: stackedFilterChannelA[0], stackedFilterChannelB[0]
-                                        für Channel[1] iterieren: stackedFilterChannelA[1], stackedFilterChannelB[1]
-                                        für Channel[2] iterieren: stackedFilterChannelA[2], stackedFilterChannelB[2]
-                                        für Channel[3] iterieren: stackedFilterChannelA[3], stackedFilterChannelB[3]
-            Die Sequenz ist ungünstig arrangiert
-            Im YT-Bsp gibt es 4 Filter-Stacks mit jeweils 2 Filtern(3x3) => 4x2x3x3
-            pooledDecreasedChannelA[][] und pooledDecreasedChannelB[][] müssen zusammengefasst an Convolution() übergeben werden
-            => [][]input-> [][][]input in Convolution()-Konstruktor-Paramlist
-         */
-        float[][][] pooledDecreasedChannels= new float[][][]{   p.poolChannel(c.getActivationSeq()[0]),
-                                                                p.poolChannel(c.getActivationSeq()[1])};
-        final float[][][] pooledDecreasedChannelsFromClip= new float[][][]{
+        final float[][][] pooledDecreasedChannelsFromClip= new float[][][]{                                             //Weil ich meine Werte nicht runde, die Werte des Tutorials aber gerundet wurden, verwende ich hier die Werte aus dem Tutorial
             new float[][]{
                 {4.0f, 0.4f,    0.2f,   0.2f,   0.2f,   0.2f,   0.2f,   0.2f,   0.2f,  0.2f,  0.2f, 0.2f},
                 {0.2f, 41.5f,  60.5f,  42.8f,  10.8f,   0.2f,   0.2f,   0.2f,   0.2f,  0.2f,  0.2f, 0.2f},
@@ -361,8 +347,7 @@ public class ConvolutionTest {
             }
         };
 
-        final float[][][]filterStackA= new float[][][] {
-                {
+        final float[][][]filterStackA= new float[][][] {{
                         {-0.442f, -0.124f, -0.237f},
                         {-0.121f, -0.207f, -0.136f},
                         {0.104f, 0.04f, 0.207f}
@@ -372,8 +357,7 @@ public class ConvolutionTest {
                         {-0.172f, -0.068f, 0.037f}
                 }
         };
-        final float[][][]filterStackB= new float[][][] {
-                {
+        final float[][][]filterStackB= new float[][][] {{
                         {0.1f, 0.04f, 0.067f},
                         {-0.174f, 0.05f, -0.063f},
                         {-0.025f, -0.073f, -0.248f}
@@ -383,8 +367,7 @@ public class ConvolutionTest {
                         {0.024f, 0.155f, 0.18f}
                 }
         };
-        final float[][][]filterStackC= new float[][][] {
-                {
+        final float[][][]filterStackC= new float[][][] {{
                         {-0.121f, -0.114f, -0.109f},
                         {0.238f, 0.273f, 0.007f},
                         {-0.065f, 0.0f, 0.102f}
@@ -394,8 +377,7 @@ public class ConvolutionTest {
                         {0.478f, 0.113f, -0.089f}
                 }
         };
-        final float[][][]filterStackD= new float[][][] {
-                {
+        final float[][][]filterStackD= new float[][][] {{
                         {-0.022f, -0.03f, 0.072f},
                         {0.113f, 0.095f, -0.037f},
                         {0.067f, -0.006f, 0.172f}
@@ -418,6 +400,169 @@ public class ConvolutionTest {
 
         Convolution cChannelsD= new Convolution(pooledDecreasedChannelsFromClip, filterStackD,
                 3, 3, filtersBiases[3], sigmoid, CONVOLUTION_STRIDE);
-        System.out.println();
+
+        final char B='B', G='G', g='g', w='w';
+        final char[][] channelAsResult= {
+                {w,w,w,G,G,g,g,B,B,B},
+                {B,B,B,B,B,B,B,B,B,B},
+                {B,B,B,B,B,B,B,B,g,g},
+                {B,B,B,w,w,w,B,B,B,B},
+                {w,w,w,w,w,w,B,B,B,B},
+                {G,G,g,w,B,B,B,B,B,B},
+                {G,G,w,w,B,B,B,B,B,B},
+                {G,w,w,B,B,B,B,B,B,B},
+                {G,w,g,B,B,B,B,B,B,g},
+                {G,w,B,B,B,B,B,B,B,g}
+        };
+        final char[][] channelBsResult= {
+                {B,B,G,w,w,w,w,w,w,g},
+                {w,w,w,g,B,B,B,B,B,B},
+                {w,w,w,w,w,w,w,w,w,G},
+                {w,w,w,w,B,B,B,B,B,B},
+                {w,w,w,w,w,w,B,B,B,G},
+                {B,B,g,B,B,B,B,B,g,B},
+                {B,B,B,B,B,B,B,B,G,B},
+                {B,B,B,B,B,B,B,w,B,G},
+                {B,B,B,B,B,B,w,G,B,B},
+                {B,B,B,B,B,B,G,B,G,B}
+        };
+        final char[][] channelCsResult= {
+                {w,w,w,w,w,w,w,w,w,w},
+                {B,G,w,w,w,w,w,w,w,w},
+                {B,w,w,G,B,w,w,B,B,B},
+                {B,B,B,B,w,w,w,w,w,g},
+                {B,B,B,B,B,B,w,w,B,G},
+                {B,B,B,G,w,w,w,B,B,B},
+                {B,B,g,w,w,w,w,B,G,g},
+                {B,G,w,w,w,w,g,B,G,B},
+                {B,w,w,w,w,B,B,g,G,B},
+                {B,w,w,w,w,B,B,B,B,B}
+        };
+        final char[][] channelDsResult= {
+                {B,B,B,B,B,B,B,B,B,B},
+                {B,B,B,B,B,B,B,B,B,G},
+                {B,B,B,B,B,B,B,B,B,g},
+                {B,B,B,B,B,B,G,w,w,g},
+                {B,B,B,B,B,B,w,w,w,g},
+                {g,B,B,B,B,w,w,w,G,g},
+                {g,g,w,g,w,w,w,g,g,g},
+                {g,w,w,w,w,w,w,g,w,G},
+                {g,w,B,w,w,w,B,G,g,G},
+                {g,w,w,w,w,w,g,g,G,g}
+        };
+        final float BLACK_MIN= 0.17f, DARK_GRAY_MAX= 0.25f, GRAY_MAX= 0.85f;
+        for(int r=0; r<channelAsResult.length; r++) {
+            for(int c=0; c<channelAsResult[0].length; c++) {
+                switch(channelAsResult[r][c]) {
+                    case 'B': {
+                        if(!(cChannelsA.getActivation()[r][c]<=BLACK_MIN))
+                            Assert.assertFalse(true);
+                        break;
+                    }
+                    case 'G': {
+                        if(!(cChannelsA.getActivation()[r][c]>BLACK_MIN) &&
+                           !(cChannelsA.getActivation()[r][c]<=DARK_GRAY_MAX))
+                            Assert.assertFalse(true);
+                        break;
+                    }
+                    case 'g': {
+                        if(!(cChannelsA.getActivation()[r][c]>DARK_GRAY_MAX) &&
+                           !(cChannelsA.getActivation()[r][c]<=GRAY_MAX))
+                            Assert.assertFalse(true);
+                        break;
+                    }
+                    case 'w': {
+                        if(!(cChannelsA.getActivation()[r][c]>GRAY_MAX))
+                            Assert.assertFalse(true);
+                        break;
+                    }
+                }
+            }
+        }
+        for(int r=0; r<channelBsResult.length; r++) {
+            for(int c=0; c<channelBsResult[0].length; c++) {
+                switch(channelBsResult[r][c]) {
+                    case 'B': {
+                        if(!(cChannelsB.getActivation()[r][c]<=BLACK_MIN))
+                            Assert.assertFalse(true);
+                        break;
+                    }
+                    case 'G': {
+                        if(!(cChannelsB.getActivation()[r][c]>BLACK_MIN) &&
+                           !(cChannelsB.getActivation()[r][c]<=DARK_GRAY_MAX))
+                            Assert.assertFalse(true);
+                        break;
+                    }
+                    case 'g': {
+                        if(!(cChannelsB.getActivation()[r][c]>DARK_GRAY_MAX) &&
+                           !(cChannelsB.getActivation()[r][c]<=GRAY_MAX))
+                            Assert.assertFalse(true);
+                        break;
+                    }
+                    case 'w': {
+                        if(!(cChannelsB.getActivation()[r][c]>0.85))
+                            Assert.assertFalse(true);
+                        break;
+                    }
+                }
+            }
+        }
+        for(int r=0; r<channelCsResult.length; r++) {
+            for(int c=0; c<channelCsResult[0].length; c++) {
+                switch(channelCsResult[r][c]) {
+                    case 'B': {
+                        if(!(cChannelsC.getActivation()[r][c]<=BLACK_MIN))
+                            Assert.assertFalse(true);
+                        break;
+                    }
+                    case 'G': {
+                        if(!(cChannelsC.getActivation()[r][c]>BLACK_MIN) &&
+                           !(cChannelsC.getActivation()[r][c]<=DARK_GRAY_MAX))
+                            Assert.assertFalse(true);
+                        break;
+                    }
+                    case 'g': {
+                        if(!(cChannelsC.getActivation()[r][c]>DARK_GRAY_MAX) &&
+                           !(cChannelsC.getActivation()[r][c]<=GRAY_MAX))
+                            Assert.assertFalse(true);
+                        break;
+                    }
+                    case 'w': {
+                        if(!(cChannelsC.getActivation()[r][c]>0.85))
+                            Assert.assertFalse(true);
+                        break;
+                    }
+                }
+            }
+        }
+        for(int r=0; r<channelDsResult.length; r++) {
+            for(int c=0; c<channelDsResult[0].length; c++) {
+                switch(channelDsResult[r][c]) {
+                    case 'B': {
+                        if(!(cChannelsD.getActivation()[r][c]<=BLACK_MIN))
+                            Assert.assertFalse(true);
+                        break;
+                    }
+                    case 'G': {
+                        if(!(cChannelsD.getActivation()[r][c]>BLACK_MIN) &&
+                           !(cChannelsD.getActivation()[r][c]<=DARK_GRAY_MAX))
+                            Assert.assertFalse(true);
+                        break;
+                    }
+                    case 'g': {
+                        if(!(cChannelsD.getActivation()[r][c]>DARK_GRAY_MAX) &&
+                           !(cChannelsD.getActivation()[r][c]<=GRAY_MAX))
+                            Assert.assertFalse(true);
+                        break;
+                    }
+                    case 'w': {
+                        if(!(cChannelsD.getActivation()[r][c]>0.85))
+                            Assert.assertFalse(true);
+                        break;
+                    }
+                }
+            }
+        }
+        Assert.assertTrue(true);
     }
 }
